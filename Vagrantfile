@@ -7,9 +7,10 @@ require 'fileutils'
 
 Vagrant.require_version ">= 2.0.0"
 
-CONFIG = File.join(File.dirname(__FILE__), "vagrant/config.rb")
+CONFIG = File.join(File.dirname(__FILE__), ENV['KUBESPRAY_VAGRANT_CONFIG'] || 'vagrant/config.rb')
 
 COREOS_URL_TEMPLATE = "https://storage.googleapis.com/%s.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json"
+FLATCAR_URL_TEMPLATE = "https://%s.release.flatcar-linux.net/amd64-usr/current/flatcar_production_vagrant.json"
 
 # Uniq disk UUID for libvirt
 DISK_UUID = Time.now.utc.to_i
@@ -18,6 +19,10 @@ SUPPORTED_OS = {
   "coreos-stable"       => {box: "coreos-stable",              user: "core", box_url: COREOS_URL_TEMPLATE % ["stable"]},
   "coreos-alpha"        => {box: "coreos-alpha",               user: "core", box_url: COREOS_URL_TEMPLATE % ["alpha"]},
   "coreos-beta"         => {box: "coreos-beta",                user: "core", box_url: COREOS_URL_TEMPLATE % ["beta"]},
+  "flatcar-stable"      => {box: "flatcar-stable",             user: "core", box_url: FLATCAR_URL_TEMPLATE % ["stable"]},
+  "flatcar-beta"        => {box: "flatcar-beta",               user: "core", box_url: FLATCAR_URL_TEMPLATE % ["beta"]},
+  "flatcar-alpha"       => {box: "flatcar-alpha",              user: "core", box_url: FLATCAR_URL_TEMPLATE % ["alpha"]},
+  "flatcar-edge"        => {box: "flatcar-edge",               user: "core", box_url: FLATCAR_URL_TEMPLATE % ["edge"]},
   "ubuntu1604"          => {box: "generic/ubuntu1604",         user: "vagrant"},
   "ubuntu1804"          => {box: "generic/ubuntu1804",         user: "vagrant"},
   "ubuntu2004"          => {box: "geerlingguy/ubuntu2004",     user: "vagrant"},
@@ -192,7 +197,7 @@ Vagrant.configure("2") do |config|
         "download_force_cache": "True",
         # Keeping the cache on the nodes can improve provisioning speed while debugging kubespray
         "download_keep_remote_cache": "False",
-        "docker_keepcache": "1",
+        "docker_rpm_keepcache": "1",
         # These two settings will put kubectl and admin.config in $inventory/artifacts
         "kubeconfig_localhost": "True",
         "kubectl_localhost": "True",
